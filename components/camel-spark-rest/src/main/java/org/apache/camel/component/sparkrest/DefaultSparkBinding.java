@@ -113,6 +113,15 @@ public class DefaultSparkBinding implements SparkBinding {
             }
         }
 
+        for ( String key : request.queryParams()) {
+            String value = request.queryParams(key);
+            Object decoded = shouldUrlDecodeHeader(configuration, key, value, "UTF-8");
+            if ( headerFilterStrategy != null &&
+                    ! headerFilterStrategy.applyFilterToExternalHeaders(key, decoded, exchange)) {
+                SparkHelper.appendHeader(headers, key, decoded);
+            }
+        }
+
         String[] splat = request.splat();
         String key = SparkConstants.SPLAT;
         if (headerFilterStrategy != null
